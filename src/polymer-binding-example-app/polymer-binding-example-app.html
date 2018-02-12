@@ -1,0 +1,108 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="example-data.html">
+
+<dom-module id="polymer-binding-example-app">
+  <template>
+    <style>
+      :host {
+        display: block;
+        border: solid 1px red;
+        padding: 1rem;
+      }
+      p {
+        font-size: 28px;
+      }
+    </style>
+
+    <p>valor de propiedad string: [[stringProp]]</p>
+    <p>valor de propiedad number: [[numberProp]]</p>
+    <p>valor de propiedad boolean: [[booleanProp]]</p>
+
+    <hr>
+    
+    <button on-click="_increaseStringProp">incrementar valor StringProp</button>
+    <button on-click="_increaseNumberProp">incrementar valor numberProp</button>
+    <button on-click="_addItemToArray">add number to array</button>
+
+    <div>
+        <template is="dom-repeat" items="[[arrayProp]]">
+          <span>- [[item]] -</span>
+        </template>
+    </div>
+    
+    <example-data
+      count="{{numberProp}}"
+      string-data="{{stringProp}}"
+      obj="[[objectProp]]"
+      arr="[[arrayProp]]"
+      boolean-prop>
+    </example-data>
+
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class PolymerBindingExampleApp extends Polymer.Element {
+      static get is() { return 'polymer-binding-example-app'; }
+      static get properties() {
+        return {
+          stringProp: {
+            type: String,
+            value: 'string property'
+          },
+          numberProp: {
+            type: Number,
+            value: 50
+          },
+          booleanProp: {
+            type: Boolean,
+            value: false
+          },
+          objectProp: {
+            type: Object,
+            value: () => {
+              return {
+                a: 'some value',
+                b: 'other value'
+              }
+            }
+          },
+          arrayProp: {
+            type: Array,
+            value: () => [1,2,3,4,5]
+          }
+        };
+      }
+
+      ready() {
+        super.ready();
+        this.addEventListener('event-example', (e) => {
+          console.log(e.detail.count);
+          e.preventDefault();
+        });
+      }
+
+      _increaseNumberProp() {
+        this.numberProp++;
+      }
+
+      _increaseStringProp() {
+        this.stringProp += 'O';
+      }
+
+      _addItemToArray() {
+        let newNum = parseInt(Math.random() * (10 - 0) + 0);
+        this.push('arrayProp',  newNum);
+        //this.arrayProp.push(newNum);
+        //this.notifySplices('arrayProp');
+      }
+
+    }
+
+    window.customElements.define(PolymerBindingExampleApp.is, PolymerBindingExampleApp);
+  </script>
+</dom-module>

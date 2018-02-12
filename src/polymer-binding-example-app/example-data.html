@@ -1,0 +1,104 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+
+<dom-module id="example-data">
+  <template>
+    <style>
+      :host {
+        display: block;
+        border: solid 1px green;
+      }
+      :host([count="55"]) p {
+        color: red;
+      }
+      p {
+        font-size: 28px;
+      }
+    </style>
+    <p>soy example-data</p>
+    <p>traza propiedad count: [[count]]</p>
+    <p>traza propiedad string: [[stringData]]</p>
+
+    <button on-click="_incrementCounter">incrementar valor count</button>
+    <button on-click="_updateStringData">modificar stringData</button>
+
+    <p>[[obj.a]]</p>
+    <button on-click="_updateObj">actualizar objeto</button>
+
+    <button on-click="_fireEvent">Fire event</button>
+    
+    <p>valor de nuestra propiedad booleana: [[booleanProp]]</p>
+    <div>
+        <template is="dom-repeat" items="[[arr]]">
+            <span>- [[item]] -</span>
+        </template>
+    </div>
+</template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class ExampleDataApp extends Polymer.Element {
+      static get is() { return 'example-data'; }
+      static get properties() {
+        return {
+            count: {
+                type: Number,
+                notify: true,
+                reflectToAttribute: true
+            },
+            stringData: {
+                type: String,
+                notify: true,
+                readOnly: true,
+                value: 'XXXXXX'
+            },
+            obj: {
+                type: Object,
+                notify: true
+            },
+            booleanProp: {
+                type: Boolean,
+                value: false
+            },
+            arr: {
+                type: Array,
+                value: () => []
+            }
+        };
+      }
+
+      ready() {
+          super.ready();
+      }
+
+      _incrementCounter() {
+          this.count++;
+      }
+
+      _updateStringData() {
+          this.stringData += 'E';
+          console.log('dsdsds');
+      }
+
+      _updateObj() {
+          //this.set('obj', {a: 'new value'});
+          this.obj.a = 'new value 2';
+          console.log(this.obj.a);
+      }
+
+      _fireEvent() {
+        let event = new CustomEvent('event-example', {
+            composed: true,
+            detail: {
+                count: this.count
+            }
+        });
+        this.dispatchEvent(event);
+      }
+    }
+
+    window.customElements.define(ExampleDataApp.is, ExampleDataApp);
+  </script>
+</dom-module>
