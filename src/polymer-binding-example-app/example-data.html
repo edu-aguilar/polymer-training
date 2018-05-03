@@ -5,14 +5,19 @@
     <style>
       :host {
         display: block;
-        border: solid 1px green;
-      }
-      :host([count="55"]) p {
-        color: red;
+        border: solid 1px var(--host-border-color, green);
       }
       p {
-        font-size: 28px;
+        font-size: 18px;
+        font-weight: 600;
+        margin-left: 2rem;
+        @apply --example-data-title;
       }
+
+      button {
+        @apply --example-data-button;
+      }
+      
     </style>
     <p>soy example-data</p>
     <p>traza propiedad count: [[count]]</p>
@@ -21,7 +26,7 @@
     <button on-click="_incrementCounter">incrementar valor count</button>
     <button on-click="_updateStringData">modificar stringData</button>
 
-    <p>[[obj.a]]</p>
+    <p>traza objeto: [[obj.a]]</p>
     <button on-click="_updateObj">actualizar objeto</button>
 
     <button on-click="_fireEvent">Fire event</button>
@@ -51,7 +56,6 @@
             stringData: {
                 type: String,
                 notify: true,
-                readOnly: true,
                 value: 'XXXXXX'
             },
             obj: {
@@ -83,13 +87,13 @@
       }
 
       _updateObj() {
-          //this.set('obj', {a: 'new value'});
-          this.obj.a = 'new value 2';
-          console.log(this.obj.a);
+        //why this is not updated?
+        // this.obj.a = 'new value';
+        // this.set('obj', this.obj);
       }
 
       _fireEvent() {
-        let event = new CustomEvent('event-example', {
+        let event = new CustomEvent(this.id+"-clicked", {
             composed: true,
             detail: {
                 count: this.count

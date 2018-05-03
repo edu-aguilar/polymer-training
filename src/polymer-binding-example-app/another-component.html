@@ -1,0 +1,35 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+
+<dom-module id="another-component">
+  <template>
+    <style>
+      :host {
+        display: block;
+        border: solid 1px black;
+      }
+    </style>
+    
+    <p>soy count: [[count]]</p>
+    <slot name="slot1"></slot>
+    <slot name="slot2"></slot>
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class AnotherComponentApp extends Polymer.Element {
+      static get is() { return 'another-component'; }
+      static get properties() {
+        return {
+          count: Number
+        }
+      }
+      
+
+    }
+
+    window.customElements.define(AnotherComponentApp.is, AnotherComponentApp);
+  </script>
+</dom-module>

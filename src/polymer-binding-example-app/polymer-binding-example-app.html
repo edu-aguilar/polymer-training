@@ -1,6 +1,9 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="example-data.html">
+<link rel="import" href="another-component.html">
 
 <dom-module id="polymer-binding-example-app">
   <template>
@@ -13,31 +16,94 @@
       p {
         font-size: 28px;
       }
+      example-data {
+        --host-border-color: green;
+        --example-data-button: {
+          color: red;
+        }
+        --example-data-title: {
+          margin-left: 5rem;
+          font-style: italic;
+        }
+      }
+
+      another-component {
+        margin-top: 1rem;
+      }
+
+      paper-button {
+        --paper-button: {
+          background-color: lightblue;
+        }
+      }
     </style>
 
     <p>valor de propiedad string: [[stringProp]]</p>
     <p>valor de propiedad number: [[numberProp]]</p>
     <p>valor de propiedad boolean: [[booleanProp]]</p>
+    <p>valor de propiedad computada: [[computedProp]]</p>
 
     <hr>
     
     <button on-click="_increaseStringProp">incrementar valor StringProp</button>
     <button on-click="_increaseNumberProp">incrementar valor numberProp</button>
+    <button on-click="_toggleBooleanProp">cambiar valor booleanProp</button>
     <button on-click="_addItemToArray">add number to array</button>
+    <button on-click="_updateObject">update Object property</button>
+    <paper-button>paper-button</paper-button>
+    <div>
+      <p>traza objeto</p>
+      <p>atributo a: {{objectProp.a}}</p>
+      <p>atributo b: {{objectProp.b}}</p>
+    </div>
 
     <div>
-        <template is="dom-repeat" items="[[arrayProp]]">
-          <span>- [[item]] -</span>
+        <p>interpolación Arrays:</p>
+        <template is="dom-repeat" items="[[arrayProp]]" as="number">
+          <p>[[index]]/[[number]]</p>
         </template>
     </div>
+
+    <div>
+      <template is="dom-if" if="[[booleanProp]]">
+        <span>- La propiedad booleanProp es true; -</span>
+      </template>
+    </div>
+
+    <div>
+      <template is="dom-if" if="{{_checkStringLength(stringProp)}}">
+        <span>La longitud de stringProp es > que 20</span>
+      </template>
+    </div>
+
+    <div>
+      <template is="dom-if" if="{{_checkArrayLength(arrayProp.*)}}">
+        <span>La longitud de arrayProp > 5</span>
+      </template>
+    </div>
     
-    <example-data
+    <!-- <example-data
+      id="exampleData1"
       count="{{numberProp}}"
       string-data="{{stringProp}}"
-      obj="[[objectProp]]"
+      obj="{{objectProp}}"
       arr="[[arrayProp]]"
       boolean-prop>
     </example-data>
+
+    <example-data 
+      id="exampleData2"
+      count="{{numberProp}}"
+      string-data="{{stringProp}}"
+      obj="{{objectProp}}"
+      arr="[[arrayProp]]"
+      boolean-prop>
+    </example-data>
+
+    <another-component count="[[numberProp]]">
+      <p slot="slot1">hola q tal slot 1</p>
+      <p slot="slot2">hola q tal slot 2</p>
+    </another-component> -->
 
   </template>
 
@@ -52,11 +118,17 @@
         return {
           stringProp: {
             type: String,
-            value: 'string property'
+            value: 'string property',
+            observer: '_stringPropChanged'
           },
           numberProp: {
             type: Number,
             value: 50
+          },
+          computedProp: {
+            type: String,
+            value: 'Default',
+            computed: '_computedCb(stringProp, numberProp)'
           },
           booleanProp: {
             type: Boolean,
@@ -64,28 +136,96 @@
           },
           objectProp: {
             type: Object,
-            value: () => {
-              return {
+            value: () => ({
                 a: 'some value',
                 b: 'other value'
-              }
-            }
+              })
           },
           arrayProp: {
             type: Array,
-            value: () => [1,2,3,4,5]
+            value: () => [1,2]
+          },
+          users: {
+            type: Array,
+            value: () => [{
+              name: 'Edu',
+              age: 27
+            },
+            {
+                name: 'Fran'
+            },
+            {
+                name: 'Javi'
+            },
+            {
+                name: 'Javi Moreno'
+            },
+            {
+                name: 'Tony'
+            }]
           }
         };
       }
 
-      ready() {
-        super.ready();
-        this.addEventListener('event-example', (e) => {
-          console.log(e.detail.count);
-          e.preventDefault();
-        });
+      static get observers() {
+        return [
+          // Observer method name, followed by a list of dependencies, in parenthesis
+          'arrayPropChanged(arrayProp.splices)',
+          'objectChanged(objectProp.*)'
+        ]
+      }
+      
+      _stringPropChanged(newValue, oldValue) {
+        console.log(newValue, oldValue);
       }
 
+      _computedCb(stringProp, numberProp) {
+        //this.computedProp = 'fufoduhfodfd';
+        //return stringProp + " " + numberProp;
+        return `${stringProp} ${numberProp}`;
+      }
+
+      _checkStringLength(stringProp) {
+        return stringProp.length > 20;
+      }
+      
+      _checkArrayLength(arrayProp) {
+        return arrayProp > 5;
+      }
+      
+      objectChanged(newVal) {
+        console.log(newVal);
+      }
+
+      _toggleBooleanProp() {
+        this.booleanProp = !this.booleanProp;
+      }
+
+      _updateObject() {
+        this.set('objectProp.b', 'value updated from method');
+        // this.objectProp.b = 'value updated from method without polymer method';
+        // this.objectProp.a = 'blablablabalba';
+        //this.notifyPath('objectProp');
+        setTimeout(() => {
+          this.set('objectProp', { a: '1234', b: '5678' });
+        }, 2000);
+      }
+
+      ready() {
+        super.ready();
+        this.addEventListener('exampleData1-clicked', this.handleEvent);
+        this.addEventListener('exampleData2-clicked', this.handleEvent);
+      }
+
+      handleEvent(e) {
+        console.log(e.detail.count);
+        e.preventDefault();
+      }
+      
+      userListChanged(newVal, oldValue) {
+        //console.log(newVal, oldValue);
+        //this.notifySplices('users', newVal.indexSplices[0]);
+      }
       _increaseNumberProp() {
         this.numberProp++;
       }
@@ -96,9 +236,14 @@
 
       _addItemToArray() {
         let newNum = parseInt(Math.random() * (10 - 0) + 0);
-        this.push('arrayProp',  newNum);
-        //this.arrayProp.push(newNum);
-        //this.notifySplices('arrayProp');
+        this.arrayProp.push(newNum);
+        this.notifySplices('arrayProp');
+        //this.push('arrayProp', newNum);
+      }
+
+      arrayPropChanged(arrayProp) {
+        console.log(arrayProp);
+        console.log(this.arrayProp);
       }
 
     }

@@ -1,0 +1,63 @@
+<link rel="import" href="bower_components/polymer/polymer-element.html">
+
+<!--
+### Styling
+
+`<paper-button>` provides the following custom properties and mixins
+for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+`--paper-button-ink-color` | Background color of the ripple | Based on the button's color
+`--paper-button` | Mixin applied to the button | `{}`
+`--first-component-mixin` | Mixin applied to the button | `{}`
+-->
+
+<dom-module id="first-component">
+  <template>
+    <style>
+      :host {
+        display: block;
+        @apply --first-component-mixin;
+      }
+
+
+    </style>
+    <h2>Hello [[prop1]]!</h2>
+    <h2>[[prop2]]</h2>
+  </template>
+  
+  <script>
+    class FirstComponent extends Polymer.Element {
+      static get is() { return 'first-component'; }
+      static get properties() {
+        return {
+          /** this property handles our state */
+          prop1: {
+            type: String,
+            value: 'first-component'
+          },
+          /**
+          * property to handle the number.
+          *
+          * @type {{elements: Array<HTMLElement>, level: number}}
+          */
+          prop2: {
+            type: Number
+          },
+          /** property which controls blablabla*/
+          booleanProp: Boolean
+        };
+      }
+      
+      /**
+      * Applies awesomeness to `element`
+      */
+      sayHello(msg) {
+        alert(msg);
+      }
+    }
+
+    window.customElements.define(FirstComponent.is, FirstComponent);
+  </script>
+</dom-module>
